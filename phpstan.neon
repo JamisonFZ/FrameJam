@@ -1,0 +1,19 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    excludePaths:
+        - tests/*
+    ignoreErrors:
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::setDescription\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::addOption\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::writeln\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::write\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::error\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::warning\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::info\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::debug\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::emergency\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::alert\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::critical\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\]+::notice\(\)#' 

@@ -2,18 +2,15 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use FrameJam\Core\Application;
+// Carrega as configurações
+$config = require_once __DIR__ . '/../config/app.php';
 
 // Inicializa a aplicação
-$app = Application::getInstance();
+$app = new FrameJam\Core\Application($config);
 
-// Define as rotas
-$router = $app->getRouter();
+// Carrega as rotas
+require_once __DIR__ . '/../routes/web.php';
+require_once __DIR__ . '/../routes/api.php';
 
-// Exemplo de rotas
-$router->get('/', function($request) {
-    return new \FrameJam\Core\Response('Bem-vindo ao FrameJam!');
-});
-
-// Executa a aplicação
+// Processa a requisição
 $app->run(); 

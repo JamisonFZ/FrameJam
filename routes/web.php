@@ -1,27 +1,29 @@
 <?php
 
-use FrameJam\Core\Router;
+use FrameJam\Core\Application;
+
+$router = Application::getInstance()->getRouter();
 
 // Rotas da aplicação
-Router::get('/', 'HomeController@index');
-Router::get('/sobre', 'HomeController@sobre');
-Router::get('/contato', 'HomeController@contato');
-Router::post('/contato', 'HomeController@enviarContato');
+$router->get('/', 'FrameJam\Controllers\HomeController@index');
+$router->get('/sobre', 'FrameJam\Controllers\HomeController@sobre');
+$router->get('/contato', 'FrameJam\Controllers\HomeController@contato');
+$router->post('/contato', 'FrameJam\Controllers\HomeController@enviarContato');
 
 // Rotas de usuários
-Router::get('/usuarios', 'UserController@index');
-Router::get('/usuarios/{id}', 'UserController@show');
-Router::get('/usuarios/criar', 'UserController@create');
-Router::post('/usuarios', 'UserController@store');
-Router::get('/usuarios/{id}/editar', 'UserController@edit');
-Router::put('/usuarios/{id}', 'UserController@update');
-Router::delete('/usuarios/{id}', 'UserController@destroy');
+$router->get('/usuarios', 'FrameJam\Controllers\UserController@index');
+$router->get('/usuarios/{id}', 'FrameJam\Controllers\UserController@show');
+$router->get('/usuarios/criar', 'FrameJam\Controllers\UserController@create');
+$router->post('/usuarios', 'FrameJam\Controllers\UserController@store');
+$router->get('/usuarios/{id}/editar', 'FrameJam\Controllers\UserController@edit');
+$router->put('/usuarios/{id}', 'FrameJam\Controllers\UserController@update');
+$router->delete('/usuarios/{id}', 'FrameJam\Controllers\UserController@destroy');
 
 // Rotas de produtos
-Router::get('/produtos', 'ProductController@index');
-Router::get('/produtos/{id}', 'ProductController@show');
-Router::get('/produtos/criar', 'ProductController@create');
-Router::post('/produtos', 'ProductController@store');
-Router::get('/produtos/{id}/editar', 'ProductController@edit');
-Router::put('/produtos/{id}', 'ProductController@update');
-Router::delete('/produtos/{id}', 'ProductController@destroy'); 
+$router->get('/produtos', 'FrameJam\Controllers\ProductController@index');
+$router->get('/produtos/{id}', 'FrameJam\Controllers\ProductController@show');
+$router->get('/produtos/criar', 'FrameJam\Controllers\ProductController@create');
+$router->post('/produtos', 'FrameJam\Controllers\ProductController@store');
+$router->get('/produtos/{id}/editar', 'FrameJam\Controllers\ProductController@edit');
+$router->put('/produtos/{id}', 'FrameJam\Controllers\ProductController@update');
+$router->delete('/produtos/{id}', 'FrameJam\Controllers\ProductController@destroy'); 

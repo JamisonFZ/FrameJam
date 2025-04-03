@@ -2,17 +2,19 @@
 
 namespace FrameJam\Core;
 
+use FrameJam\Core\View\Template;
+
 abstract class Controller
 {
     protected Request $request;
     protected Response $response;
     protected Container $container;
 
-    public function __construct()
+    public function __construct(Request $request, Response $response, Container $container)
     {
-        $this->request = Application::getInstance()->getContainer()->make(Request::class);
-        $this->response = Application::getInstance()->getContainer()->make(Response::class);
-        $this->container = Application::getInstance()->getContainer();
+        $this->request = $request;
+        $this->response = $response;
+        $this->container = $container;
     }
 
     protected function view(string $view, array $data = []): Response
@@ -23,10 +25,8 @@ abstract class Controller
             throw new \Exception("View {$view} not found");
         }
 
-        extract($data);
-        ob_start();
-        require $viewPath;
-        $content = ob_get_clean();
+        $template = new Template($viewPath, $data);
+        $content = $template->render();
 
         return $this->response->setContent($content);
     }

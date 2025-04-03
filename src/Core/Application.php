@@ -18,8 +18,15 @@ class Application
     private function __construct()
     {
         $this->container = new Container();
-        $this->router = new Router();
+        $this->router = new Router($this->container);
         $this->config = new Config();
+
+        // Registra as classes base
+        $this->container->singleton(Request::class);
+        $this->container->singleton(Response::class);
+        $this->container->singleton(Container::class, function() {
+            return $this->container;
+        });
     }
 
     public static function getInstance(): Application

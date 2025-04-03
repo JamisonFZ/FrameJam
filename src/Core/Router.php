@@ -6,6 +6,13 @@ class Router
 {
     private array $routes = [];
     private array $middlewares = [];
+    private string $prefix = '';
+    private Container $container;
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
     public function get(string $path, $handler): self
     {
@@ -27,11 +34,23 @@ class Router
         return $this->addRoute('DELETE', $path, $handler);
     }
 
+    public function group(string $prefix, callable $callback): self
+    {
+        $previousPrefix = $this->prefix;
+        $this->prefix .= $prefix;
+        
+        $callback($this);
+        
+        $this->prefix = $previousPrefix;
+        return $this;
+    }
+
     private function addRoute(string $method, string $path, $handler): self
     {
+        $fullPath = $this->prefix . $path;
         $this->routes[] = [
             'method' => $method,
-            'path' => $path,
+            'path' => $fullPath,
             'handler' => $handler,
             'middlewares' => $this->middlewares
         ];
@@ -55,7 +74,7 @@ class Router
                 
                 // Aplicar middlewares
                 foreach ($route['middlewares'] as $middleware) {
-                    $middlewareInstance = new $middleware();
+                    $middlewareInstance = $this->container->make($middleware);
                     $response = $middlewareInstance->handle($request);
                     if ($response instanceof Response) {
                         return $response;
@@ -98,7 +117,19 @@ class Router
 
         if (is_string($handler)) {
             [$controller, $method] = explode('@', $handler);
-            $controllerInstance = new $controller();
+            
+            // Registra o Controller no Container se ainda não estiver registrado
+            if (!$this->container->has($controller)) {
+                $this->container->bind($controller, function($container) use ($controller, $request) {
+                    return new $controller(
+                        $request,
+                        $container->make(Response::class),
+                        $container
+                    );
+                });
+            }
+            
+            $controllerInstance = $this->container->make($controller);
             return $controllerInstance->$method($request);
         }
 

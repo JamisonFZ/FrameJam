@@ -1,26 +1,25 @@
 <?php
 
-use FrameJam\Core\Router;
+use FrameJam\Core\Application;
 
-// Grupo de rotas da API
-Router::group('/api', function() {
-    // Usuários
-    Router::get('/users', 'Api\UserController@index');
-    Router::get('/users/{id}', 'Api\UserController@show');
-    Router::post('/users', 'Api\UserController@store');
-    Router::put('/users/{id}', 'Api\UserController@update');
-    Router::delete('/users/{id}', 'Api\UserController@destroy');
+$router = Application::getInstance()->getRouter();
 
-    // Produtos
-    Router::get('/products', 'Api\ProductController@index');
-    Router::get('/products/{id}', 'Api\ProductController@show');
-    Router::post('/products', 'Api\ProductController@store');
-    Router::put('/products/{id}', 'Api\ProductController@update');
-    Router::delete('/products/{id}', 'Api\ProductController@destroy');
+// Rotas da API
+$router->get('/api/users', 'Api\UserController@index');
+$router->get('/api/users/{id}', 'Api\UserController@show');
+$router->post('/api/users', 'Api\UserController@store');
+$router->put('/api/users/{id}', 'Api\UserController@update');
+$router->delete('/api/users/{id}', 'Api\UserController@destroy');
 
-    // Autenticação
-    Router::post('/auth/login', 'Api\AuthController@login');
-    Router::post('/auth/register', 'Api\AuthController@register');
-    Router::post('/auth/logout', 'Api\AuthController@logout');
-    Router::get('/auth/user', 'Api\AuthController@user');
-}); 
+// Produtos
+$router->get('/api/products', 'Api\ProductController@index');
+$router->get('/api/products/{id}', 'Api\ProductController@show');
+$router->post('/api/products', 'Api\ProductController@store');
+$router->put('/api/products/{id}', 'Api\ProductController@update');
+$router->delete('/api/products/{id}', 'Api\ProductController@destroy');
+
+// Autenticação
+$router->post('/api/auth/login', 'Api\AuthController@login');
+$router->post('/api/auth/register', 'Api\AuthController@register');
+$router->post('/api/auth/logout', 'Api\AuthController@logout');
+$router->get('/api/auth/user', 'Api\AuthController@user'); 

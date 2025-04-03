@@ -2,11 +2,10 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Carrega as configurações
-$config = require_once __DIR__ . '/../config/app.php';
+use FrameJam\Core\Application;
 
 // Inicializa a aplicação
-$app = new FrameJam\Core\Application($config);
+$app = Application::getInstance();
 
 // Carrega as rotas
 require_once __DIR__ . '/../routes/web.php';

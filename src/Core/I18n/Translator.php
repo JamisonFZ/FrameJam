@@ -8,7 +8,7 @@ class Translator
     private array $translations = [];
     private string $path;
 
-    public function __construct(string $locale = 'pt_BR', string $path = null)
+    public function __construct(string $locale = 'pt_BR', string $path)
     {
         $this->locale = $locale;
         $this->path = $path ?? __DIR__ . '/../../resources/lang';

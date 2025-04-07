@@ -9,9 +9,10 @@ O FrameJam utiliza variáveis de ambiente para configurar diferentes aspectos do
 cp .env.example .env
 ```
 
-2. Gere uma chave de aplicação:
+2. Configure a chave de aplicação no arquivo `.env`:
 ```bash
-php artisan key:generate
+# Gere uma string aleatória de 32 caracteres
+APP_KEY=base64:$(openssl rand -base64 32)
 ```
 
 ## Estrutura do Arquivo .env

@@ -44,7 +44,7 @@ FrameJam é um framework PHP minimalista e extensível, projetado para desenvolv
 ```bash
 composer create-project framejam/framejam my-project
 cd my-project
-php artisan serve
+php -S localhost:8000 -t public
 ```
 
 ## Estrutura de Diretórios

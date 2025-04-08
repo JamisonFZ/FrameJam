@@ -11,9 +11,9 @@ class ApiAuth
     private string $tokenPrefix = 'api_token_';
     private int $tokenExpiration = 3600; // 1 hora
 
-    public function __construct(CacheInterface $cache = null)
+    public function __construct(?CacheInterface $cache = null)
     {
-        $this->cache = $cache ?? new FileCache();
+        $this->cache = $cache ?? new FileCache(__DIR__ . '/../../../storage/cache');
     }
 
     public function generateToken(int $userId, array $scopes = []): string
@@ -53,7 +53,7 @@ class ApiAuth
     {
         $data = $this->validateToken($token);
         
-        if (!$data) {
+        if (!$data || !isset($data['scopes'])) {
             return false;
         }
         

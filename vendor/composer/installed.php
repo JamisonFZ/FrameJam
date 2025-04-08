@@ -3,7 +3,7 @@
         'name' => 'framejam/framework',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'cd6d1c225606c367dddf4a4b5a966b7c171ba598',
+        'reference' => '1db479489fa04c78d6353c22d4a31d35928a6a1e',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -43,7 +43,7 @@
         'framejam/framework' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'cd6d1c225606c367dddf4a4b5a966b7c171ba598',
+            'reference' => '1db479489fa04c78d6353c22d4a31d35928a6a1e',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

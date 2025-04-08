@@ -11,9 +11,9 @@ class QueueManager
     private string $queuePrefix = 'queue_';
     private string $defaultQueue = 'default';
 
-    public function __construct(CacheInterface $cache = null)
+    public function __construct(?CacheInterface $cache = null)
     {
-        $this->cache = $cache ?? new FileCache();
+        $this->cache = $cache ?? new FileCache(__DIR__ . '/../../storage/cache');
     }
 
     public function push(Job $job, string $queue = null): string

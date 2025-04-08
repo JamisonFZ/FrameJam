@@ -2,143 +2,130 @@
 
 namespace FrameJam\Core\Database;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use PDO;
+use ReflectionClass;
 
 class MigrationManager
 {
+    private Database $db;
     private string $migrationsPath;
     private string $migrationsTable = 'migrations';
 
-    public function __construct(string $migrationsPath = null)
+    public function __construct(string $migrationsPath)
     {
-        $this->migrationsPath = $migrationsPath ?? __DIR__ . '/../../database/migrations';
+        $this->db = Database::getInstance();
+        $this->migrationsPath = $migrationsPath;
         $this->createMigrationsTable();
     }
 
     private function createMigrationsTable(): void
     {
-        if (!Capsule::schema()->hasTable($this->migrationsTable)) {
-            Capsule::schema()->create($this->migrationsTable, function ($table) {
-                $table->increments('id');
-                $table->string('migration');
-                $table->integer('batch');
-            });
-        }
+        $sql = "CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            migration VARCHAR(255) NOT NULL,
+            batch INT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )";
+
+        $this->db->query($sql);
     }
 
-    public function migrate(): void
+    public function run(): void
     {
         $files = $this->getMigrationFiles();
         $batch = $this->getNextBatchNumber();
-        $migrated = 0;
 
         foreach ($files as $file) {
-            $migration = $this->getMigrationName($file);
-            
-            if (!$this->hasMigrated($migration)) {
-                $this->runMigration($file, $migration, $batch);
-                $migrated++;
+            $migration = $this->getMigrationInstance($file);
+
+            if ($migration) {
+                $this->runMigration($migration, $batch);
             }
         }
-
-        echo "Migrated {$migrated} migrations.\n";
     }
 
     public function rollback(): void
     {
         $batch = $this->getLastBatchNumber();
         $migrations = $this->getMigrationsForBatch($batch);
-        $rolledBack = 0;
 
         foreach (array_reverse($migrations) as $migration) {
             $this->rollbackMigration($migration);
-            $rolledBack++;
         }
-
-        echo "Rolled back {$rolledBack} migrations.\n";
     }
 
     public function reset(): void
     {
-        $batches = $this->getMigrationBatches();
-        
-        foreach (array_reverse($batches) as $batch) {
-            $this->rollbackBatch($batch);
+        while ($batch = $this->getLastBatchNumber()) {
+            $this->rollback();
         }
+    }
+
+    public function refresh(): void
+    {
+        $this->reset();
+        $this->run();
     }
 
     private function getMigrationFiles(): array
     {
         $files = glob($this->migrationsPath . '/*.php');
-        sort($files);
-        return $files;
+        $ran = $this->getRanMigrations();
+
+        return array_filter($files, function ($file) use ($ran) {
+            return !in_array(basename($file, '.php'), $ran);
+        });
     }
 
-    private function getMigrationName(string $file): string
+    private function getRanMigrations(): array
     {
-        return basename($file, '.php');
+        $sql = "SELECT migration FROM {$this->migrationsTable} ORDER BY id";
+        $result = $this->db->query($sql)->fetchAll(PDO::FETCH_COLUMN);
+
+        return $result ?: [];
     }
 
-    private function hasMigrated(string $migration): bool
+    private function getMigrationInstance(string $file): ?Migration
     {
-        return Capsule::table($this->migrationsTable)
-            ->where('migration', $migration)
-            ->exists();
+        $className = 'FrameJam\\Database\\Migrations\\' . basename($file, '.php');
+
+        if (class_exists($className)) {
+            $reflection = new ReflectionClass($className);
+
+            if ($reflection->isSubclassOf(Migration::class)) {
+                return new $className();
+            }
+        }
+
+        return null;
     }
 
-    private function runMigration(string $file, string $migration, int $batch): void
+    private function runMigration(Migration $migration, int $batch): void
     {
-        require_once $file;
-        $class = $this->getMigrationClass($migration);
-        $instance = new $class();
-        
-        $instance->up();
-        
-        Capsule::table($this->migrationsTable)->insert([
-            'migration' => $migration,
-            'batch' => $batch
-        ]);
-        
-        echo "Migrated: {$migration}\n";
+        $migration->run();
+        $this->logMigration($migration, $batch);
     }
 
-    private function rollbackMigration(string $migration): void
+    private function rollbackMigration(array $migration): void
     {
-        $file = $this->migrationsPath . '/' . $migration . '.php';
-        require_once $file;
-        
-        $class = $this->getMigrationClass($migration);
-        $instance = new $class();
-        
-        $instance->down();
-        
-        Capsule::table($this->migrationsTable)
-            ->where('migration', $migration)
-            ->delete();
-        
-        echo "Rolled back: {$migration}\n";
-    }
+        $instance = $this->getMigrationInstance($this->migrationsPath . '/' . $migration['migration'] . '.php');
 
-    private function rollbackBatch(int $batch): void
-    {
-        $migrations = $this->getMigrationsForBatch($batch);
-        
-        foreach (array_reverse($migrations) as $migration) {
-            $this->rollbackMigration($migration);
+        if ($instance) {
+            $instance->rollback();
+            $this->deleteMigration($migration['id']);
         }
     }
 
-    private function getMigrationClass(string $migration): string
+    private function logMigration(Migration $migration, int $batch): void
     {
-        $parts = explode('_', $migration);
-        array_shift($parts); // Remove timestamp
-        
-        $className = '';
-        foreach ($parts as $part) {
-            $className .= ucfirst($part);
-        }
-        
-        return $className;
+        $sql = "INSERT INTO {$this->migrationsTable} (migration, batch) VALUES (?, ?)";
+        $this->db->query($sql, [$migration->getTableName(), $batch]);
+    }
+
+    private function deleteMigration(int $id): void
+    {
+        $sql = "DELETE FROM {$this->migrationsTable} WHERE id = ?";
+        $this->db->query($sql, [$id]);
     }
 
     private function getNextBatchNumber(): int
@@ -148,25 +135,15 @@ class MigrationManager
 
     private function getLastBatchNumber(): int
     {
-        $lastBatch = Capsule::table($this->migrationsTable)
-            ->max('batch');
-            
-        return $lastBatch ?: 0;
+        $sql = "SELECT MAX(batch) as batch FROM {$this->migrationsTable}";
+        $result = $this->db->query($sql)->fetch(PDO::FETCH_ASSOC);
+
+        return (int) ($result['batch'] ?? 0);
     }
 
     private function getMigrationsForBatch(int $batch): array
     {
-        return Capsule::table($this->migrationsTable)
-            ->where('batch', $batch)
-            ->pluck('migration')
-            ->toArray();
-    }
-
-    private function getMigrationBatches(): array
-    {
-        return Capsule::table($this->migrationsTable)
-            ->distinct()
-            ->pluck('batch')
-            ->toArray();
+        $sql = "SELECT * FROM {$this->migrationsTable} WHERE batch = ? ORDER BY id";
+        return $this->db->query($sql, [$batch])->fetchAll(PDO::FETCH_ASSOC);
     }
 } 

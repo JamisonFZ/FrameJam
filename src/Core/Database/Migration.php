@@ -2,32 +2,28 @@
 
 namespace FrameJam\Core\Database;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
-
 abstract class Migration
 {
-    protected $schema;
+    protected SchemaBuilder $schema;
 
     public function __construct()
     {
-        $this->schema = Capsule::schema();
+        $this->schema = new SchemaBuilder($this->getTableName());
     }
+
+    abstract public function getTableName(): string;
 
     abstract public function up(): void;
+
     abstract public function down(): void;
 
-    protected function createTable(string $table, \Closure $callback): void
+    public function run(): void
     {
-        $this->schema->create($table, $callback);
+        $this->up();
     }
 
-    protected function dropTable(string $table): void
+    public function rollback(): void
     {
-        $this->schema->dropIfExists($table);
-    }
-
-    protected function table(string $table, \Closure $callback): void
-    {
-        $this->schema->table($table, $callback);
+        $this->down();
     }
 } 

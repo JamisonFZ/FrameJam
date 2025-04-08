@@ -125,8 +125,8 @@ class Application
             echo $response->render();
             return;
         }
-
-        throw new ApplicationException('Tipo de resposta não suportado');
+        
+        throw new ApplicationException('Tipo de resposta não suportado', 500, $response);
     }
 
     private function handleException(\Throwable $e): void
@@ -158,21 +158,33 @@ class Application
 
     public function get($abstract)
     {
-        return $this->container->get($abstract);
+        if (method_exists($this->container, 'get')) {
+            return $this->container->get($abstract);
+        }
+        throw new ApplicationException('Método get não encontrado no container', 500);
     }
 
-    public function make($abstract, array $parameters = [])
+    public function make($abstract)
     {
-        return $this->container->make($abstract, $parameters);
+        if (method_exists($this->container, 'make')) {
+            return $this->container->make($abstract);
+        }
+        throw new ApplicationException('Método make não encontrado no container');
     }
 
     public function singleton($abstract, $concrete = null)
     {
-        return $this->container->singleton($abstract, $concrete);
+        if (method_exists($this->container, 'singleton')) {
+            return $this->container->singleton($abstract, $concrete);
+        }
+        throw new ApplicationException('Método singleton não encontrado no container');
     }
 
-    public function bind($abstract, $concrete = null, $shared = false)
+    public function bind($abstract, $concrete = null)
     {
-        return $this->container->bind($abstract, $concrete, $shared);
+        if (method_exists($this->container, 'bind')) {
+            return $this->container->bind($abstract, $concrete);
+        }
+        throw new ApplicationException('Método bind não encontrado no container');
     }
 } 

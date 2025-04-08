@@ -16,7 +16,7 @@ class Logger
         'debug'     => 7
     ];
 
-    public function __construct(string $path = null)
+    public function __construct(string $path)
     {
         $this->path = $path ?? __DIR__ . '/../../storage/logs';
         if (!is_dir($this->path)) {

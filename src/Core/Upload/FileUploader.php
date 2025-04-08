@@ -8,7 +8,7 @@ class FileUploader
     private int $maxSize = 5242880; // 5MB
     private string $uploadPath;
 
-    public function __construct(string $uploadPath = null)
+    public function __construct(string $uploadPath)
     {
         $this->uploadPath = $uploadPath ?? __DIR__ . '/../../storage/uploads';
         if (!is_dir($this->uploadPath)) {

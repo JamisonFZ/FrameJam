@@ -16,9 +16,11 @@ class CreateUsersTable extends Migration
         $this->schema
             ->id()
             ->string('name')
-            ->string('email')->unique('email')
+            ->string('email')
+                ->unique('email')
             ->string('password')
-            ->string('remember_token')->nullable()
+            ->boolean('active')
+                ->default('1')
             ->timestamps()
             ->create();
     }

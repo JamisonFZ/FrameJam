@@ -6,7 +6,7 @@ class FileCache implements CacheInterface
 {
     private string $path;
 
-    public function __construct(string $path = null)
+    public function __construct(string $path)
     {
         $this->path = $path ?? __DIR__ . '/../../storage/cache';
         if (!is_dir($this->path)) {

@@ -7,6 +7,11 @@ class Container
     private array $bindings = [];
     private array $instances = [];
 
+    public function get(string $abstract)
+    {
+        return $this->make($abstract);
+    }
+
     public function bind(string $abstract, $concrete = null): void
     {
         if (is_null($concrete)) {

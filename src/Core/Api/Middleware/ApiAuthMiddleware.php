@@ -4,15 +4,16 @@ namespace FrameJam\Core\Api\Middleware;
 
 use FrameJam\Core\Middleware\MiddlewareInterface;
 use FrameJam\Core\Api\Auth\ApiAuth;
+use FrameJam\Core\Cache\FileCache;
 
 class ApiAuthMiddleware implements MiddlewareInterface
 {
     private ApiAuth $auth;
     private array $scopes = [];
 
-    public function __construct(ApiAuth $auth = null)
+    public function __construct(?ApiAuth $auth = null)
     {
-        $this->auth = $auth ?? new ApiAuth();
+        $this->auth = $auth ?? new ApiAuth(new FileCache(__DIR__ . '/../../../../storage/cache'));
     }
 
     public function requireScope(string $scope): self
@@ -35,10 +36,11 @@ class ApiAuthMiddleware implements MiddlewareInterface
             return $this->unauthorized('Token inválido ou expirado');
         }
         
-        // Verificar escopos
-        foreach ($this->scopes as $scope) {
-            if (!$this->auth->hasScope($token, $scope)) {
-                return $this->forbidden('Acesso negado: escopo necessário: ' . $scope);
+        if (!empty($this->scopes)) {
+            foreach ($this->scopes as $scope) {
+                if (!$this->auth->hasScope($token, $scope)) {
+                    return $this->forbidden("Acesso negado: escopo '{$scope}' necessário");
+                }
             }
         }
         
@@ -50,32 +52,33 @@ class ApiAuthMiddleware implements MiddlewareInterface
 
     private function getTokenFromRequest(): ?string
     {
-        // Verificar no cabeçalho Authorization
-        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $headers = getallheaders();
         
-        if (preg_match('/Bearer\s+(.*)$/i', $header, $matches)) {
-            return $matches[1];
+        // Verificar no cabeçalho Authorization
+        if (isset($headers['Authorization'])) {
+            $auth = $headers['Authorization'];
+            if (preg_match('/Bearer\s+(.*)$/i', $auth, $matches)) {
+                return $matches[1];
+            }
         }
         
         // Verificar no parâmetro da URL
-        return $_GET['token'] ?? null;
+        if (isset($_GET['token'])) {
+            return $_GET['token'];
+        }
+        
+        return null;
     }
 
     private function unauthorized(string $message): array
     {
         http_response_code(401);
-        return [
-            'error' => true,
-            'message' => $message
-        ];
+        return ['error' => $message];
     }
 
     private function forbidden(string $message): array
     {
         http_response_code(403);
-        return [
-            'error' => true,
-            'message' => $message
-        ];
+        return ['error' => $message];
     }
 } 

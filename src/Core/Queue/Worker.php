@@ -20,7 +20,7 @@ class Worker
         $this->logger = $logger;
     }
 
-    public function work(array $queues = null): void
+    public function work(array $queues): void
     {
         $this->queues = $queues ?? $this->queues;
         $this->running = true;

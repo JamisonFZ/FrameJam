@@ -84,7 +84,7 @@ class Config
             'lifetime' => getenv('SESSION_LIFETIME') ?: 120,
             'secure_cookie' => getenv('SESSION_SECURE_COOKIE') === 'true',
             'domain' => getenv('SESSION_DOMAIN'),
-            'path' => getenv('SESSION_PATH') ?: '/',
+            'path' => getenv('SESSION_PATH') ?: '/storage/sessions',
         ];
     }
 

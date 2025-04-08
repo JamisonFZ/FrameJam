@@ -8,7 +8,7 @@ Um framework PHP minimalista e extensível, construído com os componentes essen
 - Autoloading PSR-4
 - Controladores MVC
 - Sistema de Templates com Twig
-- ORM Eloquent do Laravel
+- ORM Simples
 - Sistema de Middleware
 - Gerenciamento de Configurações
 - Suporte a Variáveis de Ambiente
@@ -17,7 +17,7 @@ Um framework PHP minimalista e extensível, construído com os componentes essen
 
 - PHP 8.1 ou superior
 - Composer
-- MySQL 5.7 ou superior (para o ORM)
+- MySQL 5.7 ou superior
 
 ## Instalação
 
@@ -50,12 +50,13 @@ framejam/
 ├── public/             # Ponto de entrada da aplicação
 ├── resources/          # Views e assets
 ├── routes/             # Definição de rotas
-├── src/               # Código fonte do framework
-│   ├── Controllers/   # Controladores da aplicação
-│   ├── Core/          # Componentes principais do framework
-│   └── Models/        # Modelos da aplicação
-├── storage/           # Arquivos de cache e logs
-└── vendor/            # Dependências do Composer
+├── src/                # Código fonte do framework
+│   ├── Commands/       # Comandos para aplicação
+│   ├── Controllers/    # Controladores da aplicação
+│   ├── Core/           # Componentes principais do framework
+│   └── Database/       # Modelos da aplicação
+├── storage/            # Arquivos de cache e logs
+└── vendor/             # Dependências do Composer
 ```
 
 ## Uso Básico

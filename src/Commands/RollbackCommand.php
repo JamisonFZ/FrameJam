@@ -8,28 +8,27 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class MigrateCommand extends Command
+class RollbackCommand extends Command
 {
     protected function configure(): void
     {
-        $this->setName('migrate')
-            ->setDescription('Executa todas as migrações pendentes');
+        $this->setName('migrate:rollback')
+            ->setDescription('Reverte a última execução de migrações');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $io->title('Executando migrações...');
+        $io->title('Revertendo migrações...');
 
         try {
             $migrationManager = new MigrationManager(__DIR__ . '/../Database/Migrations');
-            $migrationManager->run();
+            $migrationManager->rollback();
             
-            $io->success('Todas as migrações foram executadas com sucesso!');
+            $io->success('Todas as migrações foram revertidas com sucesso!');
             return Command::SUCCESS;
-            
         } catch (\Exception $e) {
-            $io->error('Erro ao executar migrações: ' . $e->getMessage());
+            $io->error('Erro ao reverter migrações: ' . $e->getMessage());
             return Command::FAILURE;
         }
     }

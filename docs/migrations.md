@@ -88,18 +88,47 @@ $this->schema
 
 ## Executando Migrações
 
-Para executar uma migração:
+### Execução Individual
+
+Para executar uma migração individualmente:
 
 ```php
 $migration = new CreateUsersTable();
 $migration->run();
 ```
 
-Para reverter uma migração:
+Para reverter uma migração individual:
 
 ```php
 $migration = new CreateUsersTable();
 $migration->rollback();
+```
+
+### Execução Automática de Todas as Migrações
+
+O FrameJam fornece um sistema para executar todas as migrações automaticamente. Para isso, utilize o arquivo `src/Database/migrate.php`:
+
+1. Para executar todas as migrações:
+```bash
+./framejam migrate
+```
+
+2. Para reverter todas as migrações:
+```bash
+./framejam migrate:rollback
+```
+
+O sistema executará as migrações na ordem em que elas estão definidas no array `$migrations` da classe `Migrate`. É importante manter a ordem correta das migrações, especialmente quando há dependências entre tabelas.
+
+Para adicionar uma nova migração ao sistema automático, adicione a classe da migração no array `$migrations` dentro da classe `Migrate` em `src/Database/Migrate.php`:
+
+```php
+private array $migrations = [
+    CreateUsersTable::class,
+    CreatePostsTable::class,
+    CreateCommentsTable::class,
+    // Adicione novas migrações aqui
+];
 ```
 
 ## Configuração do Banco de Dados

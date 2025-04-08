@@ -4,7 +4,7 @@ namespace FrameJam\Database\Migrations;
 
 use FrameJam\Core\Database\Migration;
 
-class CreateUsersTable extends Migration
+class table_00001_create_users extends Migration
 {
     public function getTableName(): string
     {

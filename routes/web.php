@@ -3,7 +3,7 @@
 use FrameJam\Core\Application;
 use FrameJam\Core\Middleware\AuthMiddleware;
 
-$router = Application::getInstance()->getRouter();
+$router = Application::getInstance()->get('router');
 
 // Rota básica
 $router->get('/', 'HomeController@index');

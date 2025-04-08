@@ -15,9 +15,10 @@ abstract class Controller
 
     public function __construct()
     {
-        $loader = new FilesystemLoader(__DIR__ . '/../../resources/views');
+        $viewsPath = realpath(__DIR__ . '/../../resources/views');
+        $loader = new FilesystemLoader($viewsPath);
         $this->view = new Environment($loader, [
-            'cache' => __DIR__ . '/../../storage/cache/views',
+            'cache' => realpath(__DIR__ . '/../../storage/cache/views'),
             'auto_reload' => true,
             'debug' => true
         ]);
@@ -33,7 +34,7 @@ abstract class Controller
      */
     protected function view(string $template, array $data = []): string
     {
-        return $this->view->render($template . '.twig', array_merge($this->data, $data));
+        return $this->view->render($template, array_merge($this->data, $data));
     }
 
     /**

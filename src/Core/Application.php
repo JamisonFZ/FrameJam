@@ -18,6 +18,7 @@ class Application
     private function __construct()
     {
         $this->container = new Container();
+        $this->router = new Router();
         $this->registerBaseBindings();
     }
 
@@ -139,11 +140,6 @@ class Application
     public function getContainer(): Container
     {
         return $this->container;
-    }
-
-    public function getRouter(): Router
-    {
-        return $this->router;
     }
 
     public function setConfig(string $key, $value): void
